@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  tests:
+  build:
     runs-on: windows-latest
     steps:
     - name: Checkout code
@@ -24,6 +24,9 @@ jobs:
 
     - name: Build
       run: nimble build
+
+    - name: List Files
+      run: dir
 
     - name: Package
       run: |

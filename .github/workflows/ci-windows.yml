@@ -16,12 +16,11 @@ jobs:
     - name: Install Nim
       run: |
         curl https://nim-lang.org/choosenim/init.sh -sSf | sh -s -- -y
-        export PATH=$HOME/.nimble/bin:$PATH
+        echo 'export PATH=$HOME/.nimble/bin:$PATH' >> $GITHUB_ENV
+        source $GITHUB_ENV
 
     - name: Build project
-      run: |
-        export PATH=$HOME/.nimble/bin:$PATH
-        nimble build
+      run: nimble build
 
     - name: Upload binary
       uses: actions/upload-artifact@v2

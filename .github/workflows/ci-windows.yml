@@ -22,14 +22,14 @@ jobs:
         nimble install -y
         nimble test
 
-    - name: Build and Package
+    - name: Build
+      run: nimble build
+
+    - name: Package
       run: |
-        nimble build
         mv ./rangeit.exe ./rangeit-windows.exe
         mkdir -p release
         cp ./rangeit-windows.exe ./release/
-      env:
-        RUNNER_OS: windows
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2

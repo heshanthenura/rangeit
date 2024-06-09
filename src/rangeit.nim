@@ -46,12 +46,12 @@ proc calculateClass(ip: string): char =
     return 'E'
 
 proc customSplitEvery(s: string, n: int): seq[string] =
-  var result: seq[string]
+  var parts: seq[string]
   var i = 0
   while i < s.len:
-    result.add(s[i .. min(i + n - 1, s.len - 1)])
+    parts.add(s[i .. min(i + n - 1, s.len - 1)])
     i += n
-  return result
+  return parts
 
 proc calculateSubnetMask(CIDR: int): string =
   var mask = ""
@@ -105,26 +105,6 @@ proc calculateNetBits(cidr: int): int =
 proc calculateHostBits(cidr: int): int =
   return 32 - cidr
 
-proc ipToDecimal(ip: string): int =
-  var parts = ip.split('.')
-  return parts[0].parseInt() shl 24 or parts[1].parseInt() shl 16 or parts[2].parseInt() shl 8 or parts[3].parseInt()
-
-proc decimalToIp(decimal: int): string =
-  var parts: seq[string]
-  parts.add($((decimal shr 24) and 0xFF))
-  parts.add($((decimal shr 16) and 0xFF))
-  parts.add($((decimal shr 8) and 0xFF))
-  parts.add($(decimal and 0xFF))
-  return parts.join(".")
-
-proc calculateUsableHosts(network: string, broadcast: string): seq[string] =
-  var networkDec = ipToDecimal(network)
-  var broadcastDec = ipToDecimal(broadcast)
-  var usableHosts: seq[string]
-  for i in networkDec + 1 ..< broadcastDec:
-    usableHosts.add(decimalToIp(i))
-  return usableHosts
-
 when isMainModule:
   let args = commandLineParams()
 
@@ -133,27 +113,23 @@ when isMainModule:
     quit(1)
 
   let calcIndex = getIndex(args, "-calc")
-  let auIndex = getIndex(args, "-au")
-  if (calcIndex != -1 and calcIndex + 1 < args.len) or (auIndex != -1 and auIndex + 1 < args.len):
-    var ipNcidr = split(args[max(calcIndex, auIndex) + 1], "/")
+  if calcIndex != -1 and calcIndex + 1 < args.len:
+    var ipNcidr = split(args[calcIndex + 1], "/")
     if ipNcidr.len == 2:
       IP = ipNcidr[0]
       try:
         CIDR = ipNcidr[1].parseInt()
-        if calcIndex != -1:
-          echo "IP Class: ", calculateClass(IP)
-          echo "Subnet Mask: ", calculateSubnetMask(CIDR)
-          let networkAddress = calculateNetworkAddress(IP, CIDR)
-          let broadcastAddress = calculateBroadcastAddress(IP, CIDR)
-          echo "Network Address: ", networkAddress
-          echo "Broadcast Address: ", broadcastAddress
-          echo "Net Bits: ", calculateNetBits(CIDR)
-          echo "Host Bits: ", calculateHostBits(CIDR)
-        if auIndex != -1:
-          let networkAddress = calculateNetworkAddress(IP, CIDR)
-          let broadcastAddress = calculateBroadcastAddress(IP, CIDR)
-          let usableHosts = calculateUsableHosts(networkAddress, broadcastAddress)
-          echo "Usable Hosts: ", usableHosts.join(", ")
+        echo "INFO"
+        echo "  |-IP Address: ",IP
+        echo "  |-IP Class: ", calculateClass(IP)
+        echo "  |-CIDR Value: ", CIDR
+        echo "  |-Subnet Mask: ", calculateSubnetMask(CIDR)
+        let networkAddress = calculateNetworkAddress(IP, CIDR)
+        let broadcastAddress = calculateBroadcastAddress(IP, CIDR)
+        echo "  |-Network Address: ", networkAddress
+        echo "  |-Broadcast Address: ", broadcastAddress
+        echo "  |-Net Bits: ", calculateNetBits(CIDR)
+        echo "  |-Host Bits: ", calculateHostBits(CIDR)
       except ValueError:
         echo bgRed & "Error: CIDR value is not a valid integer." & reset
         printUsage()

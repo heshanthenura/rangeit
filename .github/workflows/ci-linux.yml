@@ -1,11 +1,12 @@
-name: Build and Release for Windows
+name: Build and Release for Linux
 
 on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: windows-latest
+  build-and-release:
+    runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -17,43 +18,47 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Test
-      run: |
-        nimble install -y
-        nimble test
+    - name: Install Dependencies
+      run: nimble install -y
 
-    - name: Build
+    - name: Run Tests
+      run: nimble test
+
+    - name: Build Executable
       run: nimble build
 
     - name: List Files
-      run: dir
+      run: ls -la
 
-    - name: Package
-      run: |
-        mv ./rangeit.exe ./rangeit-windows.exe
-        mkdir -p release
-        cp ./rangeit-windows.exe ./release/
-        
-    - name: List Files
-      run: dir
+    - name: Rename Executable
+      run: mv ./rangeit ./rangeit-linux
 
-    - name: Create release
+    - name: Create Release Directory
+      run: mkdir release
+
+    - name: Copy Executable to Release Directory
+      run: cp ./rangeit-linux ./release/
+
+    - name: Verify Release Directory Contents
+      run: ls -la release
+
+    - name: Create GitHub Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: v1.0
-        release_name: Rangeit-Windows
+        release_name: RangeIt-Linux
         draft: false
         prerelease: false
 
-    - name: Upload executable to release
+    - name: Upload Executable to Release
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: release/rangeit-windows.exe
-        asset_name: rangeit-windows.exe
+        asset_path: ./release/rangeit-linux
+        asset_name: rangeit-linux
         asset_content_type: application/octet-stream

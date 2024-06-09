@@ -116,16 +116,16 @@ when isMainModule:
       try:
         CIDR = ipNcidr[1].parseInt()
         echo "INFO"
-        echo "  |-IP Address: ",IP
-        echo "  |-IP Class: ", calculateClass(IP)
-        echo "  |-CIDR Value: ", CIDR
-        echo "  |-Subnet Mask: ", calculateSubnetMask(CIDR)
+        echo "  -IP Address: ",IP
+        echo "  -IP Class: ", calculateClass(IP)
+        echo "  -CIDR Value: ", CIDR
+        echo "  -Subnet Mask: ", calculateSubnetMask(CIDR)
         let networkAddress = calculateNetworkAddress(IP, CIDR)
         let broadcastAddress = calculateBroadcastAddress(IP, CIDR)
-        echo "  |-Network Address: ", networkAddress
-        echo "  |-Broadcast Address: ", broadcastAddress
-        echo "  |-Net Bits: ", calculateNetBits(CIDR)
-        echo "  |-Host Bits: ", calculateHostBits(CIDR)
+        echo "  -Network Address: ", networkAddress
+        echo "  -Broadcast Address: ", broadcastAddress
+        echo "  -Net Bits: ", calculateNetBits(CIDR)
+        echo "  -Host Bits: ", calculateHostBits(CIDR)
       except ValueError:
         echo bgRed & "Error: CIDR value is not a valid integer." & reset
         printUsage()

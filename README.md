@@ -29,3 +29,16 @@ rangeit -calc [range/cidr]
 ```bash 
 rangeit -calc 192.168.1.1/24
 ```
+Output
+```bash
+INFO
+  |-IP Address: 192.1.0.1
+  |-IP Class: C
+  |-CIDR Value: 24
+  |-Subnet Mask: 255.255.255.0
+  |-Network Address: 192.1.0.0
+  |-Broadcast Address: 192.1.0.255
+  |-Net Bits: 24
+  |-Host Bits: 8
+```
+

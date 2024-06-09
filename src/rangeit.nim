@@ -17,12 +17,8 @@ var CIDR: int
 proc printUsage() = 
   echo """
   Usage:
-    rangeit network [range/cidr]      Calculate network address.
-    rangeit broadcast [range/cidr]    Determine broadcast address.
-    rangeit usable [range/cidr]       List all usable IP addresses.
-    rangeit details [range/cidr]      Get network, broadcast, and all usable addresses.
     rangeit -calc [range/cidr]        Calculate and print details.
-    rangeit -au [range/cidr]          Print all usable hosts.
+      ex: rangeit -calc 192.168.1.1/24
   """
 
 proc getIndex(args: seq[string], target: string): int =

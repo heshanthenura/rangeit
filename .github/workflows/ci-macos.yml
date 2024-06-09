@@ -1,0 +1,64 @@
+name: Build and Release for macOS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install Nim
+      uses: iffy/install-nim@v5
+      with:
+        version: stable
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install Dependencies
+      run: nimble install -y
+
+    - name: Run Tests
+      run: nimble test
+
+    - name: Build Executable
+      run: nimble build
+
+    - name: List Files
+      run: ls -la
+
+    - name: Rename Executable
+      run: mv ./rangeit ./rangeit-macos
+
+    - name: Create Release Directory
+      run: mkdir release
+
+    - name: Copy Executable to Release Directory
+      run: cp ./rangeit-macos ./release/
+
+    - name: Verify Release Directory Contents
+      run: ls -la release
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: macos-v1.0
+        release_name: RangeIt-macOS
+        draft: false
+        prerelease: false
+
+    - name: Upload Executable to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./release/rangeit-macos
+        asset_name: rangeit-macos
+        asset_content_type: application/octet-stream

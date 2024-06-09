@@ -34,8 +34,23 @@ jobs:
         mkdir -p release
         cp ./rangeit-windows.exe ./release/
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v2
+    - name: Create release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: rangeit-executables
-        path: ./release/
+        tag_name: v1.0
+        release_name: Rangeit-Windows
+        draft: false
+        prerelease: false
+
+    - name: Upload executable to release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: release/rangeit-windows.exe
+        asset_name: rangeit-windows.exe
+        asset_content_type: application/octet-stream

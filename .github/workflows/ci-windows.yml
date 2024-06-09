@@ -14,8 +14,7 @@ jobs:
     - name: Install Nim
       run: |
         curl https://nim-lang.org/choosenim/init.sh -sSf | sh -s -- -y
-        echo 'export PATH=$HOME/.nimble/bin:$PATH' >> $GITHUB_ENV
-        source $GITHUB_ENV
+        echo "::add-path::$HOME/.nimble/bin"
 
     - name: Build project
       run: nimble build

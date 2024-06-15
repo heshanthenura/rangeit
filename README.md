@@ -30,24 +30,57 @@ We are actively working on adding the following features:
 * **Usable IP Address Calculation:** List all usable IP addresses within a given network range.
 
 ## Usage
+
+- ### Basic Usage
+
 ```bash 
 rangeit -calc [range/cidr] 
 ```
 
 #### Example
+
+
+
 ```bash 
 rangeit -calc 192.168.1.1/24
 ```
 Output
 ```bash
 INFO
-  |-IP Address: 192.1.0.1
-  |-IP Class: C
-  |-CIDR Value: 24
-  |-Subnet Mask: 255.255.255.0
-  |-Network Address: 192.1.0.0
-  |-Broadcast Address: 192.1.0.255
-  |-Net Bits: 24
-  |-Host Bits: 8
+  -IP Address: 192.1.0.1
+  -IP Class: C
+  -CIDR Value: 24
+  -Subnet Mask: 255.255.255.0
+  -Network Address: 192.1.0.0
+  -Broadcast Address: 192.1.0.255
+  -Net Bits: 24
+  -Host Bits: 8
+```
+- ### Calculate All Usable IP Adresses (optional)
+
+```bash 
+rangeit -calc [range/cidr] -au
 ```
 
+#### Example
+```bash 
+rangeit -calc 192.1.0.1/30 -au 
+```
+Output
+```bash
+INFO:
+  -IP Address: 192.1.0.1
+  -IP Class: C
+  -CIDR Value: 30
+  -Total IP Addresses: 4
+  -Total Usable IP Addresses: 2
+  -Subnet Mask: 255.255.255.252
+  -Network Address: 192.1.0.0
+  -Broadcast Address: 192.1.0.3
+  -Net Bits: 30
+  -Host Bits: 2
+
+ALL USABLE IP ADRESSES:
+  -192.1.0.1
+  -192.1.0.2
+```

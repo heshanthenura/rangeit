@@ -19,8 +19,8 @@ proc printUsage() =
   Usage:
     rangeit -calc [range/cidr]        Calculate and print details.
       ex: rangeit -calc 192.168.1.1/24
-    rangeit -au [range/cidr]          Print all usable IP addresses (optional).
-      ex: rangeit -au 192.168.1.1/24
+    rangeit -calc [range/cidr] -au         Print all usable IP addresses (optional).
+      ex: rangeit -calc 192.168.1.1/24 -au
   """
 
 proc getIndex(args: seq[string], target: string): int =

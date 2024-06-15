@@ -1,4 +1,4 @@
-import os, strutils, parseutils
+import os, strutils, parseutils, math
 
 const
   reset = "\x1b[0m"
@@ -19,6 +19,8 @@ proc printUsage() =
   Usage:
     rangeit -calc [range/cidr]        Calculate and print details.
       ex: rangeit -calc 192.168.1.1/24
+    rangeit -au [range/cidr]          Print all usable IP addresses (optional).
+      ex: rangeit -au 192.168.1.1/24
   """
 
 proc getIndex(args: seq[string], target: string): int =
@@ -101,6 +103,70 @@ proc calculateNetBits(cidr: int): int =
 proc calculateHostBits(cidr: int): int =
   return 32 - cidr
 
+proc calculateTotalIPAddresses(cidr: int): int =
+  return pow(2.0, float64(32 - cidr)).int  # Convert the exponent to float before passing to pow
+
+proc printAllUsableIPs(ip: string, cidr: int) =
+  var ipBlocks = ip.split('.')
+  var ipBlock0 = ipBlocks[0].parseInt()
+  var ipBlock1 = ipBlocks[1].parseInt()
+  var ipBlock2 = ipBlocks[2].parseInt()
+  var ipBlock3 = ipBlocks[3].parseInt()
+  
+  let totalIpAddrs = calculateTotalIPAddresses(cidr)
+  let usableIpAddrs = totalIpAddrs - 2  # Subtract network and broadcast addresses
+
+  # Determine network and broadcast IPs
+  let networkAddr = calculateNetworkAddress(ip, cidr)
+  let broadcastAddr = calculateBroadcastAddress(ip, cidr)
+
+  # Start from the first usable IP address
+  ipBlock3 += 1
+
+  # Loop through usable IP addresses
+  for i in 1..usableIpAddrs:
+    # Skip network and broadcast addresses
+    if ipBlock3 == 0 or ipBlock3 == 255:
+      ipBlock3 += 1
+      
+      if ipBlock3 > 255:
+        ipBlock3 = 0
+        ipBlock2 += 1
+
+        if ipBlock2 > 255:
+          ipBlock2 = 0
+          ipBlock1 += 1
+
+          if ipBlock1 > 255:
+            ipBlock1 = 0
+            ipBlock0 += 1
+
+            if ipBlock0 > 255:
+              echo "Reached the end of IPv4 space."
+              quit(1)
+      
+      continue  # Skip to the next iteration if it's a network or broadcast address
+
+    echo "  -" & $ipBlock0 & "." & $ipBlock1 & "." & $ipBlock2 & "." & $ipBlock3
+
+    ipBlock3 += 1
+
+    if ipBlock3 > 255:
+      ipBlock3 = 0
+      ipBlock2 += 1
+
+      if ipBlock2 > 255:
+        ipBlock2 = 0
+        ipBlock1 += 1
+
+        if ipBlock1 > 255:
+          ipBlock1 = 0
+          ipBlock0 += 1
+
+          if ipBlock0 > 255:
+            echo "Reached the end of IPv4 space."
+            quit(1)
+
 when isMainModule:
   let args = commandLineParams()
 
@@ -108,31 +174,38 @@ when isMainModule:
     printUsage()
     quit(1)
 
-  let calcIndex = getIndex(args, "-calc")
+  var calcIndex = getIndex(args, "-calc")
   if calcIndex != -1 and calcIndex + 1 < args.len:
     var ipNcidr = split(args[calcIndex + 1], "/")
-    if ipNcidr.len == 2:
+    if ipNcidr.len >= 2:
       IP = ipNcidr[0]
       try:
         CIDR = ipNcidr[1].parseInt()
-        echo "INFO"
-        echo "  -IP Address: ",IP
+        let NAddr = calculateNetworkAddress(IP, CIDR)
+        let BAddr = calculateBroadcastAddress(IP, CIDR)
+        echo "INFO:"
+        echo "  -IP Address: ", IP
         echo "  -IP Class: ", calculateClass(IP)
         echo "  -CIDR Value: ", CIDR
+        echo "  -Total IP Addresses: ", calculateTotalIPAddresses(CIDR)
+        echo "  -Total Usable IP Addresses: ", calculateTotalIPAddresses(CIDR) - 2
         echo "  -Subnet Mask: ", calculateSubnetMask(CIDR)
-        let networkAddress = calculateNetworkAddress(IP, CIDR)
-        let broadcastAddress = calculateBroadcastAddress(IP, CIDR)
-        echo "  -Network Address: ", networkAddress
-        echo "  -Broadcast Address: ", broadcastAddress
+        echo "  -Network Address: ", NAddr
+        echo "  -Broadcast Address: ", BAddr
         echo "  -Net Bits: ", calculateNetBits(CIDR)
         echo "  -Host Bits: ", calculateHostBits(CIDR)
+
+        # Check if -au flag is present
+        if getIndex(args, "-au") != -1:
+          echo "\nALL USABLE IP ADRESSES:"
+          printAllUsableIPs(NAddr,CIDR)
+          
+
       except ValueError:
         echo bgRed & "Error: CIDR value is not a valid integer." & reset
-        printUsage()
         quit(1)
     else:
       echo bgRed & "Error: Invalid format for range/cidr." & reset
-      printUsage()
       quit(1)
   else:
     printUsage()

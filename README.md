@@ -2,11 +2,11 @@
 
 ## Download
 
-* ### [Linux](https://github.com/heshanthenura/rangeit/releases/tag/linux-v1.0)
+* ### [Linux](https://github.com/heshanthenura/rangeit/releases/tag/linux-v1.1)
 
-* ### [MacOS](https://github.com/heshanthenura/rangeit/releases/tag/macos-v1.0)
+* ### [MacOS](https://github.com/heshanthenura/rangeit/releases/tag/macos-v1.1)
 
-* ### [Windows](https://github.com/heshanthenura/rangeit/releases/tag/v1.0)
+* ### [Windows](https://github.com/heshanthenura/rangeit/releases/tag/v1.1)
 
 ## Overview
 `rangeit` is a utility tool designed for professionals working in networking to calculate and display various details about a given IP range. It supports operations like calculating the network address, broadcast address, and more. Our goal is to provide an easy-to-use tool for network administrators and IT professionals to manage and understand their networks better.
